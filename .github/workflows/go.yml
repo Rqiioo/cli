@@ -1,4 +1,4 @@
-name: Tests
+name: Android
 on: [push, pull_request]
 
 permissions:
@@ -9,14 +9,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        go: [android-latest, edge-latest, google-latest]
+    runs-on: ${{ android.go }}
 
     steps:
       - name: Set up Go 1.18
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 12
 
       - name: Check out code
         uses: actions/checkout@v3
@@ -25,15 +25,15 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
-          key: go-${{ runner.os }}-${{ hashFiles('go.mod') }}
+          key: go-${{ runner.go }}-${{ hashFiles('go.mod') }}
           restore-keys: |
-            go-${{ runner.os }}-
+            go-${{ runner.go }}-
 
       - name: Download dependencies
-        run: go mod download
+        run: go android download
 
       - name: Run tests
         run: go test -race ./...
 
       - name: Build
-        run: go build -v ./cmd/gh
+        run: go build -v ./sha/gh
